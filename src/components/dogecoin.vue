@@ -17,8 +17,8 @@
             </label>
             <label>
                 <button :class="['u-button', 'u-button-primary', 'u-submit', 'kiwi-welcome-simple-start']"  style="width:100%;margin-top:10px;" @click="isHidden=true;">Annulla</button>
-            </label>    		
-		</div>
+            </label>
+        </div>
     </div>
 </template>
 
