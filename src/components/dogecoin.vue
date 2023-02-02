@@ -1,14 +1,12 @@
 <template>
     <div>
         <a class="kiwi-userbox-action" v-if="address" @click="isHidden=false" style="margin-bottom:10px !important;">
-            <span class="DogeSymbol">Ð</span>
-            TIP DOGE
+            <span class="DogeSymbol">Ð</span> TIP DOGE
         </a>
 
-        <div v-if="!isHidden" class="modal" @click="isHidden=true">
-        </div>
-        
-		<div v-if="!isHidden" class="reportform">
+        <div v-if="!isHidden" class="modal" @click="isHidden=true"></div>
+
+        <div v-if="!isHidden" class="reportform">
     		<h3>Send Tip</h3>
             <div class="error" v-if="reporterror"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Indica un importo!</div>
             <label>
@@ -21,7 +19,6 @@
                 <button :class="['u-button', 'u-button-primary', 'u-submit', 'kiwi-welcome-simple-start']"  style="width:100%;margin-top:10px;" @click="isHidden=true;">Annulla</button>
             </label>    		
 		</div>
-
     </div>
 </template>
 
