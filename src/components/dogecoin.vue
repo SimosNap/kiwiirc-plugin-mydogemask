@@ -7,7 +7,7 @@
         <div v-if="!isHidden" class="modal" @click="isHidden=true"></div>
 
         <div v-if="!isHidden" class="reportform">
-    		<h3>Send Tip</h3>
+            <h3>Send Tip</h3>
             <div class="error" v-if="reporterror"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Indica un importo!</div>
             <label>
                 <input type="number" placeholder="0.69" step="0.01" min="0.01" v-model="tipAmount"/>
