@@ -5,20 +5,21 @@
             TIP DOGE
         </a>
 
-
         <div v-if="!isHidden" class="modal" @click="isHidden=true">
         </div>
+        
 		<div v-if="!isHidden" class="reportform">
     		<h3>Send Tip</h3>
-    		<div class="error" v-if="reporterror"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Indica un importo!</div>
+            <div class="error" v-if="reporterror"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Indica un importo!</div>
             <label>
                 <input type="number" placeholder="0.69" step="0.01" min="0.01" v-model="tipAmount"/>
             </label>
-    		</fieldset>
-    		<label><button :class="['u-button', 'u-button-primary', 'u-submit', 'kiwi-welcome-simple-start']"  style="width:100%;" @click="onTip()">Send Dogecoin</button></label>
-    		<label><button :class="['u-button', 'u-button-primary', 'u-submit', 'kiwi-welcome-simple-start']"  style="width:100%;margin-top:10px;" @click="isHidden=true;">Annulla</button></label>
-    		
-    		
+            <label>
+                <button :class="['u-button', 'u-button-primary', 'u-submit', 'kiwi-welcome-simple-start']"  style="width:100%;" @click="onTip()">Send Dogecoin</button>
+            </label>
+            <label>
+                <button :class="['u-button', 'u-button-primary', 'u-submit', 'kiwi-welcome-simple-start']"  style="width:100%;margin-top:10px;" @click="isHidden=true;">Annulla</button>
+            </label>    		
 		</div>
 
     </div>
