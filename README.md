@@ -1,4 +1,4 @@
-#MyDogeMask KiwiIRC Plugin
+# MyDogeMask KiwiIRC Plugin
 
 # Donations
 
