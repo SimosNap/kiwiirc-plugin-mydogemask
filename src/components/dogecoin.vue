@@ -93,7 +93,7 @@ export default {
                 let buffer = this.$state.getActiveBuffer();
                 let mynick = this.$state.getActiveNetwork().nick;
                 
-                this.network.ircClient.notice(this.user.nick, 'You have a tip from ' + mynick + ',  you got ' + this.tipAmount + ' Dogecoin! Check the transaction on dogechain https://dogechain.info/tx/' + txReqRes.txId, { type: 'notice', tags: { '+simosnap.org/tip': this.tipAmount + ';' + txReqRes.txId } });
+                this.network.ircClient.notice(this.user.nick, 'You have a tip from ' + mynick + ',  you got ' + this.tipAmount + ' Dogecoin! Check the transaction on dogechain https://dogechain.info/tx/' + txReqRes.txId, { '+simosnap.org/tip': this.tipAmount + ';' + txReqRes.txId } );
 
                 this.$state.addMessage(buffer,
                     {

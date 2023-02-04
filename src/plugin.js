@@ -19,15 +19,14 @@ kiwi.plugin('mydogemask', (kiwi) => {
         let tData = message.tags['+simosnap.org/tip'].split(';');
         let tAmount = tData[0];
         let tID = tData[1];
-        const isSelf = event.message.nick === event.buffer.getNetwork().currentUser().nick;
-        console.log(event.buffer.name);
+        let nickname = event.message.nick;
 
         event.message.bodyTemplate = kiwi.Vue.extend(TipMsg);
+        event.message.type = 'privmsg'; event.message.nick = '';
         event.message.bodyTemplateProps = {
             id: tID,
             amount: tAmount,
-            nickname: event.message.nick,
-            self: isSelf,
+            nickname: nickname,
         };
     });
 });
