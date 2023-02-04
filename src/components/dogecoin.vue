@@ -54,7 +54,6 @@ export default {
             if (!this.user.account) {
                 return;
             }
-            // console.log('USER', this.user);
 
             const xhr = new XMLHttpRequest();
             xhr.open('GET', 'https://www.simosnap.org/rest/service.php/nmisc/' + this.user.account);
@@ -88,11 +87,13 @@ export default {
                 recipientAddress: this.address,
                 dogeAmount: this.tipAmount,
             }, (txReqRes) => {
+                
                 // console.log('request transaction result', txReqRes);
+                
                 let buffer = this.$state.getActiveBuffer();
-                this.network.ircClient.notice(this.user.nick, 'You have a tip! check the transaction on dogechain https://dogechain.info/tx/' + txReqRes.txId, { type: 'notice', tags: { '+simosnap.org/tip': this.tipAmount + ';' + txReqRes.txId } });
-
                 let mynick = this.$state.getActiveNetwork().nick;
+                
+                this.network.ircClient.notice(this.user.nick, 'You have a tip! check the transaction on dogechain https://dogechain.info/tx/' + txReqRes.txId, { type: 'notice', tags: { '+simosnap.org/tip': this.tipAmount + ';' + txReqRes.txId } });
 
                 this.$state.addMessage(buffer,
                     {
@@ -103,6 +104,7 @@ export default {
                         hostname: 'INFO',
                         target: mynick,
                     });
+                    
                 this.isHidden = true;
             });
         },

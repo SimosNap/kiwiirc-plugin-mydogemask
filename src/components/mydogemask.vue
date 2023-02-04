@@ -5,7 +5,7 @@
             <button class="MyDogeConnect" @click="onConnect"><i class="fa fa-paw MyDogeIcon" aria-hidden="true"/> {{ btnText }}</button>
         </div>
         <div v-if="this.pluginState.connected" class="address">Address: <span>{{ address }}</span></div>
-        <div v-if="this.pluginState.connected" class="balance">Balance: {{ balance }} Ð</div>
+        <div v-if="this.pluginState.connected" class="balance">Balance: {{ this.pluginState.balance }} Ð</div>
     </main>
 </template>
 
@@ -19,7 +19,6 @@ export default {
         return {
             btnText: 'MyDogeMask Connect',
             address: false,
-            balance: 0,
         };
     },
     methods: {
@@ -52,7 +51,7 @@ export default {
 
                     mydogemask.getBalance((balanceRes) => {
                         // console.log('balance result', balanceRes);
-                        this.balance = sb.toBitcoin(balanceRes.balance);
+                        this.pluginState.balance = sb.toBitcoin(balanceRes.balance);
                     });
                 }
             });
