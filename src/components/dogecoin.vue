@@ -1,14 +1,27 @@
 <template>
     <div>
-        <a v-if="address" class="kiwi-userbox-action" style="margin-bottom:10px !important;" @click="isHidden=false">
+        <a v-if="address && !isSelf()" class="kiwi-userbox-action" style="margin-bottom:10px !important;" @click="isHidden=false">
             <span class="DogeSymbol">Ð</span> TIP DOGE
         </a>
 
+        <a v-if="isSelf() && this.user.account && address" class="kiwi-userbox-action dogecoin-address" style="margin-bottom:10px !important;">
+            <!-- <span class="address">{{address}}</span> -->
+            <input type="text" :value="address">
+        </a>
+        
+        <a v-if="isSelf() && this.user.account && !address" class="kiwi-userbox-action" style="margin-bottom:10px !important;" @click="Hidden=false">
+            Set Dogecoin Address
+        </a>
+        
+        <a v-if="isSelf() && this.user.account && address" class="kiwi-userbox-action" style="margin-bottom:10px !important;" @click="onUnsetAddress()">
+            Unset Dogecoin Address
+        </a>
+        
         <div v-if="!isHidden" class="modal" @click="isHidden=true"/>
 
         <div v-if="!isHidden" class="tipform">
             <h3 class="tipheader"><i class="fa fa-paw MyDogeIcon" aria-hidden="true"/> Tip {{ this.user.nick }}</h3>
-            <div v-if="reporterror" class="error"><i class="fa fa-exclamation-triangle" aria-hidden="true"/> Indica un importo!</div>
+            <div v-if="tiperror" class="error"><i class="fa fa-exclamation-triangle" aria-hidden="true"/> MyDogeMask not connected!</div>
             <label class="tipsend">
                 <input v-model="tipAmount" type="number" placeholder="0.69" step="0.01" min="0.01">
             </label>
@@ -19,12 +32,33 @@
                 <button :class="['u-button', 'u-button-primary', 'u-submit', 'kiwi-welcome-simple-start']" style="width:100%;margin-top:10px;" @click="isHidden=true;">Annulla</button>
             </label>
         </div>
+
+        <div v-if="!Hidden" class="modal" @click="Hidden=true"/>
+
+        <div v-if="!Hidden" class="addrform">
+            <h3 class="addrheader"><i class="fa fa-paw MyDogeIcon" aria-hidden="true"/> Dogecoin Wallet</h3>
+            <div v-if="addrerror" class="error"><i class="fa fa-exclamation-triangle" aria-hidden="true"/> Invalid Dogecoin Address!</div>
+            <fieldset><legend>Set address</legend>
+                <label class="addrset">
+                    <input v-model="nsaddress" type="text" placeholder="">
+                </label>
+            </fieldset>
+            <label>
+                <button :class="['u-button', 'u-button-primary', 'u-submit', 'kiwi-welcome-simple-start']" style="width:100%;" @click="onNsAddress()">Set Address</button>
+            </label>
+            <label>
+                <button :class="['u-button', 'u-button-primary', 'u-submit', 'kiwi-welcome-simple-start']" style="width:100%;margin-top:10px;" @click="Hidden=true;">Annulla</button>
+            </label>
+            
+        </div>
+
     </div>
 </template>
 
 <script>
 
 import sb from 'satoshi-bitcoin';
+import WAValidator from 'multicoin-address-validator';
 
 export default {
     props: ['network', 'user', 'pluginState'],
@@ -33,7 +67,11 @@ export default {
         return {
             address: '',
             isHidden: true,
+            Hidden: true,
             tipAmount: '',
+            addrerror: false,
+            tiperror: false,
+            notinstalled: false,
         };
     },
     watch: {
@@ -51,8 +89,15 @@ export default {
             return this.user === this.network.currentUser();
         },
         getAddress() {
+            
+            const mydogemask = window.doge;
+            
             if (!this.user.account) {
                 return;
+            }
+
+            if (!mydogemask?.isMyDogeMask) {
+                this.notinstalled = true;
             }
 
             const xhr = new XMLHttpRequest();
@@ -66,7 +111,12 @@ export default {
                 if (!dogecoin) {
                     return;
                 }
-                this.address = dogecoin;
+                let valid = WAValidator.validate(dogecoin, 'doge');
+                if (valid) {
+                    this.address = dogecoin;
+                } else {
+                    this.address = '';
+                }
             };
             xhr.send();
         },
@@ -79,7 +129,8 @@ export default {
             }
 
             if (!this.pluginState.connected) {
-                alert('MyDogeMask not connected!');
+                //alert('MyDogeMask not connected!');
+                this.tiperror = true;
                 return;
             }
 
@@ -106,19 +157,86 @@ export default {
                     });
                     
                 this.isHidden = true;
+                this.tiperror = false;
             });
 
         },
+		onNsAddress() {
+    		let valid = WAValidator.validate(this.nsaddress, 'DOGE');
+			if ((this.nsaddress !== '') && (valid)) {
+				kiwi.state.$emit('input.raw', '/NS SET DOGECOIN '+ this.nsaddress );
+				kiwi.emit('userbox.show', this.user);
+				this.Hidden = true;
+				this.address = this.nsaddress;
+				this.addrerror = false;
+			} else {
+				//alert('Wrong Format, please insert a valid Dogecoin Address');
+				this.addrerror = true;
+			}
+		},
+		onUnsetAddress() {
+				kiwi.state.$emit('input.raw', '/NS SET DOGECOIN' );
+				kiwi.emit('userbox.show', this.user);
+				this.address = '';
+		},
 
     },
 };
 </script>
 <style>
+
+.dogecoin-address {
+    background: #fcc153;
+    border-color: #fcc153;
+}
+
+.kiwi-userbox .kiwi-userbox-actions .kiwi-userbox-action.dogecoin-address:hover {
+    background-color: #fcc153 !important;
+    color: black;
+    border-color: #fcc153;
+}
+
+span.address {
+    font-size:0.70em;
+}
+
+.dogecoin-address input {
+    padding:5px;
+    border: 1px dotted var(--comp-border);
+    background: white;
+    border-radius: 3px;
+    color: black;
+    width:100%;
+    box-sizing: border-box;
+    
+}
+
+.addrform fieldset {
+    border-radius: 8px;
+    margin-bottom:15px;
+    border:1px solid  var(--brand-link-normal);
+}
+
+.addrform input[type=text] {
+    width: 100%;
+    border: 1px solid var(--comp-border);
+    padding: 5px;
+    border-radius: 3px;
+    box-sizing: border-box;
+}
+
+.tipform .error, .addrform .error {
+    background: var(--brand-error);
+    padding: 5px;
+    border-radius: 3px;
+    box-sizing: border-box;
+}
+    
 .tipheader {
     text-align:center;
 }
 
-.tipheader i {
+.tipheader i , .addrheader i {
     color: white;
     border: 1px solid #fcc153;
     padding: 3px;
@@ -126,11 +244,11 @@ export default {
     background-color: #fcc153;
 }
 
-.kiwi-userbox-plugin-actions div.tipform {
+.kiwi-userbox-plugin-actions div.tipform , .kiwi-userbox-plugin-actions div.addrform{
     width: auto;
 }
 
-.tipform {
+.tipform , .addrform {
     position: absolute;
     z-index: 99999999999999;
     left: 50%;
@@ -145,12 +263,12 @@ export default {
     box-sizing: border-box;
 }
 
-.tiform label {
+.tipform label , .addrform label {
     display: block;
     font-weight:bold;
 }
 
-.tipsend {
+.tipsend , addrset {
     margin: 1.5em;
     text-align: center;
 }
