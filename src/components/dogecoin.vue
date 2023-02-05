@@ -8,15 +8,15 @@
             <!-- <span class="address">{{address}}</span> -->
             <input type="text" :value="address">
         </a>
-        
+
         <a v-if="isSelf() && this.user.account && !address" class="kiwi-userbox-action" style="margin-bottom:10px !important;" @click="Hidden=false">
             Set Dogecoin Address
         </a>
-        
+
         <a v-if="isSelf() && this.user.account && address" class="kiwi-userbox-action" style="margin-bottom:10px !important;" @click="onUnsetAddress()">
             Unset Dogecoin Address
         </a>
-        
+
         <div v-if="!isHidden" class="modal" @click="isHidden=true"/>
 
         <div v-if="!isHidden" class="tipform">
@@ -49,7 +49,7 @@
             <label>
                 <button :class="['u-button', 'u-button-primary', 'u-submit', 'kiwi-welcome-simple-start']" style="width:100%;margin-top:10px;" @click="Hidden=true;">Annulla</button>
             </label>
-            
+
         </div>
 
     </div>
@@ -89,9 +89,8 @@ export default {
             return this.user === this.network.currentUser();
         },
         getAddress() {
-            
             const mydogemask = window.doge;
-            
+
             if (!this.user.account) {
                 return;
             }
@@ -129,7 +128,7 @@ export default {
             }
 
             if (!this.pluginState.connected) {
-                //alert('MyDogeMask not connected!');
+                // alert('MyDogeMask not connected!');
                 this.tiperror = true;
                 return;
             }
@@ -138,13 +137,11 @@ export default {
                 recipientAddress: this.address,
                 dogeAmount: this.tipAmount,
             }, (txReqRes) => {
-                
-                // console.log('request transaction result', txReqRes);
-                
+
                 let buffer = this.$state.getActiveBuffer();
                 let mynick = this.$state.getActiveNetwork().nick;
-                
-                this.network.ircClient.notice(this.user.nick, 'You have a tip from ' + mynick + ',  you got ' + this.tipAmount + ' Dogecoin! Check the transaction on dogechain https://dogechain.info/tx/' + txReqRes.txId, { '+simosnap.org/tip': this.tipAmount + ';' + txReqRes.txId } );
+
+                this.network.ircClient.notice(this.user.nick, 'You have a tip from ' + mynick + ',  you got ' + this.tipAmount + ' Dogecoin! Check the transaction on dogechain https://dogechain.info/tx/' + txReqRes.txId, { '+simosnap.org/tip': this.tipAmount + ';' + txReqRes.txId });
 
                 this.$state.addMessage(buffer,
                     {
@@ -155,30 +152,29 @@ export default {
                         hostname: 'INFO',
                         target: mynick,
                     });
-                    
+
                 this.isHidden = true;
                 this.tiperror = false;
             });
-
         },
-		onNsAddress() {
+        onNsAddress() {
     		let valid = WAValidator.validate(this.nsaddress, 'DOGE');
-			if ((this.nsaddress !== '') && (valid)) {
-				kiwi.state.$emit('input.raw', '/NS SET DOGECOIN '+ this.nsaddress );
-				kiwi.emit('userbox.show', this.user);
-				this.Hidden = true;
-				this.address = this.nsaddress;
-				this.addrerror = false;
-			} else {
-				//alert('Wrong Format, please insert a valid Dogecoin Address');
-				this.addrerror = true;
-			}
-		},
-		onUnsetAddress() {
-				kiwi.state.$emit('input.raw', '/NS SET DOGECOIN' );
-				kiwi.emit('userbox.show', this.user);
-				this.address = '';
-		},
+            if ((this.nsaddress !== '') && (valid)) {
+                kiwi.state.$emit('input.raw', '/NS SET DOGECOIN ' + this.nsaddress);
+                kiwi.emit('userbox.show', this.user);
+                this.Hidden = true;
+                this.address = this.nsaddress;
+                this.addrerror = false;
+            } else {
+                // alert('Wrong Format, please insert a valid Dogecoin Address');
+                this.addrerror = true;
+            }
+        },
+        onUnsetAddress() {
+            kiwi.state.$emit('input.raw', '/NS SET DOGECOIN');
+            kiwi.emit('userbox.show', this.user);
+            this.address = '';
+        },
 
     },
 };
@@ -208,7 +204,7 @@ span.address {
     color: black;
     width:100%;
     box-sizing: border-box;
-    
+
 }
 
 .addrform fieldset {
@@ -231,7 +227,7 @@ span.address {
     border-radius: 3px;
     box-sizing: border-box;
 }
-    
+
 .tipheader {
     text-align:center;
 }
