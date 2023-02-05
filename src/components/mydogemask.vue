@@ -7,21 +7,24 @@
         <div v-if="this.pluginState.connected" class="address">Address: <span>{{ address }}</span></div>
         <div v-if="this.pluginState.connected" class="balance">Balance: {{ this.pluginState.balance }} Ð</div>
 
+        <div v-if="!Hidden" class="modal" @click="Hidden=true"/>
+
         <div v-if="!Hidden" class="addrconf">
             <h3 class="confheader"><i class="fa fa-paw MyDogeIcon" aria-hidden="true"/> MyDoge Synch</h3>
 
             <fieldset><legend>Info</legend>
                 <input type="hidden" v-model="nsmydogemask">
                     <div class="scroller">
-                Synching MyDoge wallet will override your current Dogecoin address settings in your account.
-                If you want receive tips on a different Dogecoin address, skip synching and set it manually.
+                        <!-- Synching MyDoge wallet will override your current Dogecoin address settings in your account.
+                        If you want receive tips on a different Dogecoin address, skip synching and set it manually. -->
+                        Do you want to set this wallet to receive tips?
                     </div>
             </fieldset>
             <label>
-                <button :class="['u-button', 'u-button-primary', 'u-submit', 'kiwi-welcome-simple-start']" style="width:100%;" @click="onSynchAddress();Hidden=true;">Synch</button>
+                <button :class="['u-button', 'u-button-primary', 'u-submit', 'kiwi-welcome-simple-start']" style="width:100%;" @click="onSynchAddress();Hidden=true;">Yes</button>
             </label>
             <label>
-                <button :class="['u-button', 'u-button-primary', 'u-submit', 'kiwi-welcome-simple-start']" style="width:100%;margin-top:10px;" @click="Hidden=true;">Close</button>
+                <button :class="['u-button', 'u-button-primary', 'u-submit', 'kiwi-welcome-simple-start']" style="width:100%;margin-top:10px;" @click="Hidden=true;">No</button>
             </label>
             
         </div>
@@ -72,11 +75,14 @@ export default {
                     this.address = connectRes.address;
                     this.btnText = 'Disconnect';
                     this.nsmydogemask = this.address;
-                    this.Hidden = false;
                     mydogemask.getBalance((balanceRes) => {
                         // console.log('balance result', balanceRes);
                         this.pluginState.balance = sb.toBitcoin(balanceRes.balance);
                     });
+
+                    if (this.$state.getActiveNetwork().currentUser().account) {
+                        this.Hidden = false;
+                    }
                 }
             });
         },
@@ -92,7 +98,7 @@ export default {
 }
 .MyDogeConnect {
     padding: 5px 10px;
-    background: #fcc153;
+    background: #fdc41c;
     border-radius: 3px;
     border: 1px solid #333;
     color: #333;
@@ -131,10 +137,10 @@ export default {
 
 .confheader i {
     color: white;
-    border: 1px solid #fcc153;
+    border: 1px solid #fdc41c;
     padding: 3px;
     border-radius: 3px;
-    background-color: #fcc153;
+    background-color: #fdc41c;
 }
 
 .kiwi-userbox-plugin-actions div.addrconf{
@@ -162,8 +168,7 @@ export default {
 }
 
 .scroller {
-    overflow-y: scroll;
-    height: 120px;
+
 }
 
 

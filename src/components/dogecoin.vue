@@ -186,14 +186,14 @@ export default {
 <style>
 
 .dogecoin-address {
-    background: #fcc153;
-    border-color: #fcc153;
+    background: #fdc41c;
+    border-color: #fdc41c;
 }
 
 .kiwi-userbox .kiwi-userbox-actions .kiwi-userbox-action.dogecoin-address:hover {
-    background-color: #fcc153 !important;
+    background-color: #fdc41c !important;
     color: black;
-    border-color: #fcc153;
+    border-color: #fdc41c;
 }
 
 span.address {
@@ -238,10 +238,10 @@ span.address {
 
 .tipheader i , .addrheader i {
     color: white;
-    border: 1px solid #fcc153;
+    border: 1px solid #fdc41c;
     padding: 3px;
     border-radius: 3px;
-    background-color: #fcc153;
+    background-color: #fdc41c;
 }
 
 .kiwi-userbox-plugin-actions div.tipform , .kiwi-userbox-plugin-actions div.addrform{
