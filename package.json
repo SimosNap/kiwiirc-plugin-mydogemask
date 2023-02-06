@@ -42,7 +42,7 @@
     },
     "dependencies": {
         "multicoin-address-validator": "^0.5.12",
-        "qr-creator": "^1.0.0",
+        "qrcode": "^1.5.1",
         "satoshi-bitcoin": "^1.0.5"
     }
 }

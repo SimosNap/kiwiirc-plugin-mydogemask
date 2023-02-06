@@ -21,7 +21,14 @@
 
         <div v-if="!isHidden" class="tipform">
             <h3 class="tipheader"><i class="fa fa-paw MyDogeIcon" aria-hidden="true"/> Tip {{ this.user.nick }}</h3>
-            <div v-if="tiperror" class="error"><i class="fa fa-exclamation-triangle" aria-hidden="true"/> MyDogeMask not connected!</div>
+            <div class="external-wallet" v-if="!this.pluginState.connected">
+                <img v-if="generatedQR" :src="generatedQR" class="qrcode">
+                <div class="address-link">
+                    <i class="fa fa-clipboard clipboard-copy" aria-hidden="true" @click="copyAddress()"></i>
+                    <input type="text" :value="address">
+                </div>
+            </div>
+            <div v-if="this.pluginState.connected">
             <label class="tipsend">
                 <input v-model="tipAmount" type="number" placeholder="0.69" step="0.01" min="0.01">
             </label>
@@ -31,6 +38,7 @@
             <label>
                 <button :class="['u-button', 'u-button-primary', 'u-submit', 'kiwi-welcome-simple-start']" style="width:100%;margin-top:10px;" @click="isHidden=true;">Annulla</button>
             </label>
+            </div>
         </div>
 
         <div v-if="!Hidden" class="modal" @click="Hidden=true"/>
@@ -59,6 +67,7 @@
 
 import sb from 'satoshi-bitcoin';
 import WAValidator from 'multicoin-address-validator';
+import QRCode from 'qrcode';
 
 export default {
     props: ['network', 'user', 'pluginState'],
@@ -88,6 +97,9 @@ export default {
         isSelf() {
             return this.user === this.network.currentUser();
         },
+        copyAddress() {
+          navigator.clipboard.writeText(this.address);
+        },
         getAddress() {
             const mydogemask = window.doge;
 
@@ -113,6 +125,7 @@ export default {
                 let valid = WAValidator.validate(dogecoin, 'doge');
                 if (valid) {
                     this.address = dogecoin;
+                    QRCode.toDataURL(this.address,{quality:1, errorCorrectionLevel:'H', width: 200}).then((result) => this.generatedQR = result);
                 } else {
                     this.address = '';
                 }
@@ -181,6 +194,51 @@ export default {
 </script>
 <style>
 
+.clipboard-copy {
+  -webkit-transition-duration: 0.4s; /* Safari */
+  transition-duration: 0.4s;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.clipboard-copy:after {
+  content: "Copied!";
+  display: block;
+  position: absolute;
+  text-shadow: 1px 1px 1px;
+  opacity: 0;
+  transition: all 0.8s;
+  border-radius:50%;
+}
+
+.clipboard-copy:active:after {
+  padding: 0;
+  margin: 0;
+  opacity: 1;
+  transition: 0s
+}
+
+.external-wallet {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.address-link {
+    width: 215px !important;
+}
+.external-wallet input[type=text] {
+    width: calc(100% - 20px);
+    border: 1px solid var(--comp-border);
+    padding: 5px;
+    border-radius: 3px;
+    box-sizing: border-box;
+}
+.qrcode {
+    border: 1px dotted var(--comp-border);
+    border-radius: 3px;
+    margin: 10px;
+}
 .dogecoin-address {
     background: #fdc41c;
     border-color: #fdc41c;
@@ -251,7 +309,7 @@ span.address {
     transform: translate(-50%);
     height:auto;
     background:white;
-    bottom:90px;
+    top:20px;
     display:block;
     border-radius: 8px;
     padding: 10px;
