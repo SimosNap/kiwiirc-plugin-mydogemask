@@ -15,7 +15,7 @@
 
             <fieldset>
                 <legend>Info</legend>
-                <input type="hidden" v-model="nsmydogemask">
+                <input v-model="nsmydogemask" type="hidden">
                 <div class="scroller">
                     <!-- Synching MyDoge wallet will override your current Dogecoin address settings in your account.
                         If you want receive tips on a different Dogecoin address, skip synching and set it manually. -->
@@ -24,15 +24,16 @@
             </fieldset>
             <label>
                 <button :class="['u-button', 'u-button-primary', 'u-submit', 'kiwi-welcome-simple-start']"
-                    style="width:100%;" @click="onSynchAddress();Hidden=true;">Yes</button>
+                        style="width:100%;" @click="onSynchAddress();Hidden=true;"
+                >Yes</button>
             </label>
             <label>
                 <button :class="['u-button', 'u-button-primary', 'u-submit', 'kiwi-welcome-simple-start']"
-                    style="width:100%;margin-top:10px;" @click="Hidden=true;">No</button>
+                        style="width:100%;margin-top:10px;" @click="Hidden=true;"
+                >No</button>
             </label>
 
         </div>
-
 
     </main>
 </template>
@@ -102,12 +103,12 @@ export default {
         },
         async dogePoll() {
             const mydogemask = window.doge;
-            
+
             const connectionStatusRes = await mydogemask
                 .getConnectionStatus()
                 .catch(console.error);
 
-            //console.log('connection status result', connectionStatusRes);
+            // console.log('connection status result', connectionStatusRes);
 
             if (!connectionStatusRes?.connected) {
                 await this.connectDoge();

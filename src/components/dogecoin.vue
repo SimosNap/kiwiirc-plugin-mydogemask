@@ -21,23 +21,23 @@
 
         <div v-if="!isHidden" class="tipform">
             <h3 class="tipheader"><i class="fa fa-paw MyDogeIcon" aria-hidden="true"/> Tip {{ this.user.nick }}</h3>
-            <div class="external-wallet" v-if="!this.pluginState.connected">
+            <div v-if="!this.pluginState.connected" class="external-wallet">
                 <img v-if="generatedQR" :src="generatedQR" class="qrcode">
                 <div class="address-link">
-                    <i class="fa fa-clipboard clipboard-copy" aria-hidden="true" @click="copyAddress()"></i>
+                    <i class="fa fa-clipboard clipboard-copy" aria-hidden="true" @click="copyAddress()"/>
                     <input type="text" :value="address">
                 </div>
             </div>
             <div v-if="this.pluginState.connected">
-            <label class="tipsend">
-                <input v-model="tipAmount" type="number" placeholder="0.69" step="0.01" min="0.01">
-            </label>
-            <label>
-                <button :class="['u-button', 'u-button-primary', 'u-submit', 'kiwi-welcome-simple-start']" style="width:100%;" @click="onTip()">Send Dogecoin</button>
-            </label>
-            <label>
-                <button :class="['u-button', 'u-button-primary', 'u-submit', 'kiwi-welcome-simple-start']" style="width:100%;margin-top:10px;" @click="isHidden=true;">Annulla</button>
-            </label>
+                <label class="tipsend">
+                    <input v-model="tipAmount" type="number" placeholder="0.69" step="0.01" min="0.01">
+                </label>
+                <label>
+                    <button :class="['u-button', 'u-button-primary', 'u-submit', 'kiwi-welcome-simple-start']" style="width:100%;" @click="onTip()">Send Dogecoin</button>
+                </label>
+                <label>
+                    <button :class="['u-button', 'u-button-primary', 'u-submit', 'kiwi-welcome-simple-start']" style="width:100%;margin-top:10px;" @click="isHidden=true;">Annulla</button>
+                </label>
             </div>
         </div>
 
@@ -98,7 +98,7 @@ export default {
             return this.user === this.network.currentUser();
         },
         copyAddress() {
-          navigator.clipboard.writeText(this.address);
+            navigator.clipboard.writeText(this.address);
         },
         getAddress() {
             const mydogemask = window.doge;
@@ -125,7 +125,7 @@ export default {
                 let valid = WAValidator.validate(dogecoin, 'doge');
                 if (valid) {
                     this.address = dogecoin;
-                    QRCode.toDataURL(this.address,{quality:1, errorCorrectionLevel:'H', width: 200}).then((result) => this.generatedQR = result);
+                    QRCode.toDataURL(this.address, { quality: 1, errorCorrectionLevel: 'H', width: 200 }).then((result) => this.generatedQR = result);
                 } else {
                     this.address = '';
                 }
@@ -150,7 +150,6 @@ export default {
                 recipientAddress: this.address,
                 dogeAmount: this.tipAmount,
             }, (txReqRes) => {
-
                 let buffer = this.$state.getActiveBuffer();
                 let mynick = this.$state.getActiveNetwork().nick;
 
