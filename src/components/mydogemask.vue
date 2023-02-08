@@ -82,7 +82,11 @@ export default {
                 this.address = connectRes.address;
                 this.btnText = 'Disconnect';
                 this.nsmydogemask = this.address;
-
+                
+                //const balanceRes = await mydogemask.getBalance();
+                //const balanceBC = sb.toBitcoin(balanceRes.balance);
+                //this.pluginState.balance = balanceBC;
+            
                 if (this.$state.getActiveNetwork().currentUser().account) {
                     this.Hidden = false;
                 }
@@ -110,19 +114,20 @@ export default {
 
             // console.log('connection status result', connectionStatusRes);
 
-            if (!connectionStatusRes?.connected) {
-                await this.connectDoge();
-            }
+            //if (!connectionStatusRes?.connected) {
+               //await this.dogeConnect();
+               //this.pluginState.connected = false;
+            //}
 
             if (!this.pluginState.connected) {
                 // connection failed
-                setTimeout(this.pollDoge, 10000);
+                setTimeout(this.pollDoge, 60000);
                 return;
             }
 
             await this.dogeBalance();
 
-            setTimeout(this.dogePoll, 10000);
+            setTimeout(this.dogePoll, 60000);
         },
         async dogeBalance() {
             const mydogemask = window.doge;
@@ -201,7 +206,7 @@ export default {
         right: 5px;
         height: auto;
         background: #111;
-        bottom: 90px;
+        top: 20px;
         display: block;
         border-radius: 8px;
         padding: 10px;
