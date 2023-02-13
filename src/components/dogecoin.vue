@@ -308,7 +308,7 @@ span.address {
     left: 50%;
     transform: translate(-50%);
     height:auto;
-    background:white;
+    background:var(--brand-default-bg);
     top:20px;
     display:block;
     border-radius: 8px;

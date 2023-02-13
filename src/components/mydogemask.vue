@@ -205,7 +205,7 @@ export default {
         left: 5px;
         right: 5px;
         height: auto;
-        background: #111;
+        background: var(--comp-statebrowser-bg);
         top: 20px;
         display: block;
         border-radius: 8px;
