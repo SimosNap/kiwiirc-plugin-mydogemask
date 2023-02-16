@@ -1,7 +1,7 @@
 <template>
     <div>
         <a v-if="address && !isSelf()" class="kiwi-userbox-action" style="margin-bottom:10px !important;" @click="isHidden=false">
-            <span class="DogeSymbol">Ð</span> TIP DOGE
+            <span class="doge-symbol"></span>Dogecoin Tipping Jar
         </a>
 
         <a v-if="isSelf() && this.user.account && address" class="kiwi-userbox-action dogecoin-address" style="margin-bottom:10px !important;">
@@ -68,6 +68,7 @@
 import sb from 'satoshi-bitcoin';
 import WAValidator from 'multicoin-address-validator';
 import QRCode from 'qrcode';
+import TipMsg from './tipmsg.vue';
 
 export default {
     props: ['network', 'user', 'pluginState'],
@@ -159,7 +160,13 @@ export default {
                 this.$state.addMessage(buffer,
                     {
                         message: '⚠ You sent a tip of ' + this.tipAmount + ' Ðogecoin to ' + this.user.nick + ' check the transaction on dogechain https://dogechain.info/tx/' + txReqRes.txId,
-                        bodyTemplate: '',
+                        bodyTemplate: TipMsg,
+                        bodyTemplateProps: {
+                            id: txReqRes.txId,
+                            amount: this.tipAmount,
+                            nickname: this.user.nick,
+                            self: true,
+                        },
                         nick: '',
                         ident: 'INFO',
                         hostname: 'INFO',
@@ -193,6 +200,16 @@ export default {
 };
 </script>
 <style>
+
+.doge-symbol {
+    background: url("/plugins/wallet-icons/tippingjar_48.png");
+    background-size: 18px;
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    margin-bottom: -4px;
+    margin-right: 5px;
+}
 
 .clipboard-copy {
   -webkit-transition-duration: 0.4s; /* Safari */

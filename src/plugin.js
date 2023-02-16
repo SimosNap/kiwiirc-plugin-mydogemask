@@ -27,6 +27,7 @@ kiwi.plugin('mydogemask', (kiwi) => {
             id: tID,
             amount: tAmount,
             nickname: nickname,
+            self: false,
         };
     });
 });

@@ -3,20 +3,24 @@
         <div class="tip-icon">
             <img src="plugins/wallet-icons/tippingjar_48.png">
         </div>
-        <div>
+        <div v-if="!self">
             <p>You got a Tip! <a class="kiwi-nick" :data-nick="nickname">{{ nickname }}</a> sent you {{ amount }} Ðogecoin!</p>
-            <p><a :href="dogechain" target="_blank">View on Sochain</a></p>
+            <p><a :href="dogechain" target="_blank">View Transaction</a></p>
         </div>
+        <div v-else>
+            <p>You sent a tip of {{ amount }} Ðogecoin to <a class="kiwi-nick" :data-nick="nickname">{{ nickname }}</a>!</p>
+            <p><a :href="dogechain" target="_blank">View Transaction</a></p>
+        </div>        
     </div>
 </template>
 
 <script>
 
 export default {
-    props: ['id', 'amount', 'nickname'],
+    props: ['id', 'amount', 'nickname', 'self'],
     data() {
         return {
-            dogechain: 'https://sochain.com/tx/DOGE/' + this.id,
+            dogechain: 'https://dogecoinlab.org/blockchain/tx/' + this.id,
         };
     },
 };
