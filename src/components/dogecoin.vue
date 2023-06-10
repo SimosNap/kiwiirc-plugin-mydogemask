@@ -1,6 +1,6 @@
 <template>
     <div>
-        <a v-if="address && !isSelf()" class="kiwi-userbox-action" style="margin-bottom:10px !important;" @click="isHidden=false">
+        <a v-if="address && !isSelf()" class="kiwi-userbox-action" style="margin-bottom:10px !important;" @click="isHidden=false;tipAmount=''">
             <span class="doge-symbol"></span>Dogecoin Tipping Jar
         </a>
 
@@ -166,6 +166,8 @@ export default {
                             amount: this.tipAmount,
                             nickname: this.user.nick,
                             self: true,
+                            error: false,
+                            reason: '',
                         },
                         nick: '',
                         ident: 'INFO',
@@ -175,6 +177,31 @@ export default {
 
                 this.isHidden = true;
                 this.tiperror = false;
+            })
+            .catch((error) => {
+                console.error(`onRejected function called: ${error.message}`);
+                let buffer = this.$state.getActiveBuffer();
+                let mynick = this.$state.getActiveNetwork().nick;
+                this.$state.addMessage(buffer,
+                    {
+                        message: '⚠ You failed to send a tip of ' + this.tipAmount + ' Ðogecoin to ' + this.user.nick + ': ' + error.message,
+                        bodyTemplate: TipMsg,
+                        bodyTemplateProps: {
+                            id: error.message,
+                            amount: this.tipAmount,
+                            nickname: this.user.nick,
+                            self: true,
+                            error: true,
+                            reason: error.message,
+                        },
+                        nick: '',
+                        ident: 'INFO',
+                        hostname: 'INFO',
+                        target: mynick,
+                    });
+
+                this.isHidden = true;
+                this.tiperror = true;
             });
         },
         onNsAddress() {

@@ -1,12 +1,14 @@
 import MyDogeMask from './components/mydogemask.vue';
 import DogeCoin from './components/dogecoin.vue';
 import TipMsg from './components/tipmsg.vue';
+import ExtraInfo from './components/extrainfo.vue';
 
 // eslint-disable-next-line no-undef
 kiwi.plugin('mydogemask', (kiwi) => {
     let pluginState = new kiwi.Vue({ data() { return { connected: false, balance: 0 }; } });
     kiwi.addUi('browser', MyDogeMask, { props: { pluginState } });
     kiwi.addUi('userbox_button', DogeCoin, { props: { pluginState } });
+    kiwi.addUi('about_buffer', ExtraInfo, { title: 'Extra Info', props: { pluginState } });
 
     kiwi.on('message.new', (event) => {
         let message = event.message;

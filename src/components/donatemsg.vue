@@ -3,14 +3,9 @@
         <div class="tip-icon">
             <img src="plugins/wallet-icons/tippingjar_48.png">
         </div>
-        <div v-if="!self">
-            You got a Tip! <a class="kiwi-nick" :data-nick="nickname">{{ nickname }}</a> sent you {{ amount }} Ðogecoin!
-            <br>
-            <a :href="dogechain" target="_blank">View Transaction</a>
-        </div>
-        <div v-else>
-            <span v-if="!error">You sent a tip of {{ amount }} Ðogecoin to <a class="kiwi-nick" :data-nick="nickname">{{ nickname }}</a>!</span>
-            <span v-else>You failed to send a Ðogecoin tip to <a class="kiwi-nick" :data-nick="nickname">{{ nickname }}</a>!</span>
+        <div>
+            <span v-if="!error">You sent a tip of {{ amount }} Ðogecoin to <a class="u-link kiwi-channel" :data-channel="channel">{{ channel }}</a>!</span>
+            <span v-else>You failed to send a Ðogecoin tip to <a class="ku-link kiwi-channel" :data-channel="channel">{{ channel }}</a>!</span>
             <br>
             <span v-if="!error"><a :href="dogechain" target="_blank">View Transaction</a></span>
             <span v-else>Reason: {{ reason }}</span>
@@ -21,7 +16,7 @@
 <script>
 
 export default {
-    props: ['id', 'amount', 'nickname', 'self', 'error', 'reason'],
+    props: ['id', 'amount', 'channel', 'self', 'error', 'reason'],
     data() {
         return {
             dogechain: 'https://dogecoinlab.org/blockchain/tx/' + this.id,
