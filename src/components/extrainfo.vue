@@ -1,7 +1,11 @@
 <template>
     <div class="kiwi-extra-info-container">
-        <div v-if="registered">
+        <div v-if="registered" style="margin-bottom:1.5em;">
+            <span style="font-weight:bold;">Founder:</span> <span>{{founder}}</span>
+            <br>
             <span style="font-weight:bold;">Categoria:</span> <span v-if="categoria">{{categoria}}</span><span v-else>Non impostata</span>
+            <br>
+            <span style="font-weight:bold;">Picco Utenza:</span> <span>{{peak}} {{peak_time}}</span>
         </div>
         <div v-else>
             <span>Canale temporaneo non registrato</span>
@@ -15,8 +19,8 @@
             <i class="fa fa-twitter-square fa-2x"></i>
         </a>
 
-        <a class="extra-twitch" v-if="twitch" style="margin-bottom:10px !important;" :href="twitch" target="_blank">
-            <i class="fa fa-twitch fa-2x"></i>
+        <a class="extra-twitch" v-if="twitch" style="margin-bottom:10px !important;" @click="twitchShow()">
+            <i class="fa fa-twitch fa-2x" style="font-size:90%"></i>
         </a>
 
         <a class="extra-facebook" v-if="facebook" :href="facebook" target="_blank">
@@ -64,6 +68,7 @@ import sb from 'satoshi-bitcoin';
 import WAValidator from 'multicoin-address-validator';
 import QRCode from 'qrcode';
 import DonateMsg from './donatemsg.vue';
+import twitchIframe from './twitchiframe.vue';
 
 export default {
     props: ['network', 'user', 'pluginState'],
@@ -71,10 +76,13 @@ export default {
         return {
             address: '',
             twitter: '',
+            twitch: '',
             facebook: '',
             url: '',
             categoria: '',
             founder: '',
+            peak: '',
+            peak_time: '',
             registered : false,
             isHidden: true,
             tipAmount: '',
@@ -87,20 +95,73 @@ export default {
         buffer() {
             this.address = '';
             this.twitter = '';
+            this.twitch = '';
             this.facebook = '';
             this.url = '';
             this.categoria = '';
             this.founder = '';
+            this.peak = '';
+            this.peak_time = '';
             this.registered = false,
             this.getExtra();
+            this.getFounder();
         },
     },
     mounted() {
+        this.listen(kiwi, 'irc.channel info', (event) => { 
+            this.getExtra();
+            this.getFounder();
+        });
         this.getExtra();
+        this.getFounder();
     },
     methods: {
         copyAddress() {
             navigator.clipboard.writeText(this.address);
+        },
+        
+        twitchShow() {
+            //kiwi.state.$emit('mediaviewer.hide');
+            kiwi.Vue.nextTick(() => { kiwi.state.$emit('mediaviewer.show', { component: twitchIframe, componentProps: { twitch: this.twitch } }) });
+        },
+        getFounder() {
+
+            const buffer = kiwi.state.getActiveBuffer();
+            
+            if (!('r' in buffer.modes)) {
+                this.registered = false;
+                this.founder = '';
+                return;
+            } else {
+                this.registered = true;                
+            }
+
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', 'https://www.simosnap.org/rest/service.php/fullchannels/' + encodeURIComponent(kiwi.state.getActiveBuffer().name));
+            xhr.responseType = 'json';
+            xhr.onload = (e) => {
+                if (xhr.status !== 200) {
+                    return;
+                }
+
+                const founder = xhr.response.chan_founder;
+                if (founder) {
+                        this.founder = founder;
+                }
+                
+                const peak = xhr.response.users_max;
+                if (peak) {
+                        this.peak = peak;
+                }
+                
+                const peak_time = xhr.response.users_max_time;
+                if (peak_time) {
+                        const date = new Date(Date.parse(peak_time));
+                        this.peak_time = date.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                }
+                
+            };
+            xhr.send();
         },
         getExtra() {
             
@@ -126,8 +187,6 @@ export default {
             if (!mydogemask?.isMyDogeMask) {
                 this.notinstalled = true;
             }
-            
-            console.log(kiwi.state.getActiveBuffer());
 
             const xhr = new XMLHttpRequest();
             xhr.open('GET', 'https://www.simosnap.org/rest/service.php/cmisc/' + encodeURIComponent(kiwi.state.getActiveBuffer().name));
@@ -136,7 +195,6 @@ export default {
                 if (xhr.status !== 200) {
                     return;
                 }
-                console.log(xhr.response);
 
                 const categoria = xhr.response.CATEGORIA;
                 if (categoria) {
@@ -157,6 +215,13 @@ export default {
                     this.twitter = twitter;
                 } else {
                     this.twitter = '';
+                }
+                
+                const twitch = xhr.response.TWITCH;
+                if (twitch) {
+                    this.twitch = twitch;
+                } else {
+                    this.twitch = '';
                 }
                 
                 const facebook = xhr.response.FACEBOOK;
@@ -201,7 +266,7 @@ export default {
                 recipientAddress: this.address,
                 dogeAmount: this.tipAmount,
             }).then((txReqRes) => {
-                console.log('request transaction result', txReqRes);
+                //console.log('request transaction result', txReqRes);
                 let buffer = this.$state.getActiveBuffer();
                 let mynick = this.$state.getActiveNetwork().nick;
 
@@ -255,8 +320,8 @@ export default {
     },
     computed: {
         buffer() {
-            return this.getExtra();
-        }
+            return this.$state.getActiveBuffer();
+        },
     },
 }
 </script>

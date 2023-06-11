@@ -151,7 +151,7 @@ export default {
                 recipientAddress: this.address,
                 dogeAmount: this.tipAmount,
             }).then((txReqRes) => {
-                console.log('request transaction result', txReqRes);
+                //console.log('request transaction result', txReqRes);
                 let buffer = this.$state.getActiveBuffer();
                 let mynick = this.$state.getActiveNetwork().nick;
 
