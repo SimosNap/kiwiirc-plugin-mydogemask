@@ -20,6 +20,7 @@
         <div v-if="!isHidden" class="modal" @click="isHidden=true"/>
 
         <div v-if="!isHidden" class="tipform">
+            <i class="fa fa-times-circle" aria-hidden="true" @click="isHidden=true" style="position:absolute;top:5px;right:5px;"></i>
             <h3 class="tipheader"><i class="fa fa-paw MyDogeIcon" aria-hidden="true"/> Tip {{ this.user.nick }}</h3>
             <div v-if="!this.pluginState.connected" class="external-wallet">
                 <img v-if="generatedQR" :src="generatedQR" class="qrcode">

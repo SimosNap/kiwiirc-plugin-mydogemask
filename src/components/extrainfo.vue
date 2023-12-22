@@ -3,9 +3,13 @@
         <div v-if="registered" style="margin-bottom:1.5em;">
             <span style="font-weight:bold;">Founder:</span> <span>{{founder}}</span>
             <br>
-            <span style="font-weight:bold;">Categoria:</span> <span v-if="categoria">{{categoria}}</span><span v-else>Non impostata</span>
+            <span style="font-weight:bold;">Categoria:</span>
+            <a v-if="categoria" :href="categoria_url" class="u-link" target="_blank">{{categoria}}</a>
+            <span v-else>Non impostata</span>
             <br>
-            <span style="font-weight:bold;">Picco Utenza:</span> <span>{{peak}} {{peak_time}}</span>
+            <span style="font-weight:bold;">Picco Utenza:</span> 
+            <span class="u-link" style="text-decoration:none;pointer:normal;">{{peak}} </span>
+            <span style="text-transform:capitalize;">{{peak_time}}</span>
         </div>
         <div v-else>
             <span>Canale temporaneo non registrato</span>
@@ -19,7 +23,7 @@
             <i class="fa fa-twitter-square fa-2x"></i>
         </a>
 
-        <a class="extra-twitch" v-if="twitch" style="margin-bottom:10px !important;" @click="twitchShow()">
+        <a class="extra-twitch" v-if="twitch" style="cursor:pointer;" @click="twitchShow()">
             <i class="fa fa-twitch fa-2x" style="font-size:90%"></i>
         </a>
 
@@ -27,14 +31,22 @@
             <i class="fa fa-facebook-square fa-2x"></i>
         </a>
 
+        <a class="extra-youtube" v-if="youtube" :href="youtube" target="_blank">
+            <i class="fa fa-youtube-square fa-2x"></i>
+        </a>
+        
+        <a class="extra-github" v-if="github" :href="github" target="_blank">
+            <i class="fa fa-github-square fa-2x"></i>
+        </a>
+
         <a v-if="address" class="kiwi-channelinfo-action" @click="isHidden=false;tipAmount=''">
             <span class="doge-button"></span>
         </a>
-        
 
         <div v-if="!isHidden" class="modal" @click="isHidden=true"/>
 
         <div v-if="!isHidden" class="tipform">
+            <i class="fa fa-times-circle" aria-hidden="true" @click="isHidden=true" style="position:absolute;top:5px;right:5px;"></i>
             <h3 class="tipheader"><i class="fa fa-paw MyDogeIcon" aria-hidden="true"/> Tip </h3>
             <div v-if="!this.pluginState.connected" class="external-wallet">
                 <img v-if="generatedQR" :src="generatedQR" class="qrcode">
@@ -70,6 +82,12 @@ import QRCode from 'qrcode';
 import DonateMsg from './donatemsg.vue';
 import twitchIframe from './twitchiframe.vue';
 
+const twitter_regex = /^(https?:\/\/)?(www\.)?twitter\.com\/(?:#!\/)?(\w+\/status\/\d+|\w+)$/;
+const youtube_regex = /^(https?:\/\/)?(www\.)?youtube\.com\/(c\/|channel\/|user\/|@)?([a-zA-Z0-9-_\.]{1,})$/;
+const facebook_regex = /^(https?:\/\/)?(www\.)?facebook\.com\/[a-zA-Z0-9_.-]+$/;
+const github_regex = /^(https?:\/\/)?(www\.)?github\.com\/.+$/;
+const twitch_regex = /^(?:https?:\/\/)?(?:www\.)?twitch\.tv\/([a-zA-Z0-9_]{4,25})$/;
+
 export default {
     props: ['network', 'user', 'pluginState'],
     data() {
@@ -77,9 +95,12 @@ export default {
             address: '',
             twitter: '',
             twitch: '',
+            youtube: '',
             facebook: '',
+            github: '',
             url: '',
             categoria: '',
+            categoria_url: '',
             founder: '',
             peak: '',
             peak_time: '',
@@ -96,9 +117,12 @@ export default {
             this.address = '';
             this.twitter = '';
             this.twitch = '';
+            this.youtube = '';
             this.facebook = '';
+            this.github = '';
             this.url = '';
             this.categoria = '';
+            this.categoria_url = '';
             this.founder = '';
             this.peak = '';
             this.peak_time = '';
@@ -157,7 +181,7 @@ export default {
                 const peak_time = xhr.response.users_max_time;
                 if (peak_time) {
                         const date = new Date(Date.parse(peak_time));
-                        this.peak_time = date.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                        this.peak_time = date.toLocaleDateString(undefined, { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
                 }
                 
             };
@@ -172,9 +196,13 @@ export default {
             if (!('r' in buffer.modes)) {
                 this.registered = false;
                 this.categoria = '';
+                this.categoria_url = '';
                 this.address = '';
                 this.twitter = '';
+                this.twitch = '';
+                this.youtube = '';
                 this.facebook = '';
+                this.github = '';
                 this.url = '';
                 return;
             } else {
@@ -199,36 +227,53 @@ export default {
                 const categoria = xhr.response.CATEGORIA;
                 if (categoria) {
                         this.categoria = categoria;
+                        this.categoria_url = 'https://www.simosnap.org/channel#' + categoria
                 } else {
                         this.categoria = '';
+                        this.categoria_url = '';
                 }
                 
                 const dogecoin = xhr.response.DOGECOIN;
-                if (dogecoin) {
+                if (dogecoin && WAValidator.validate(dogecoin, 'doge')) {
                     this.address = dogecoin;
                 } else {
                     this.address = '';
                 }
                 
                 const twitter = xhr.response.TWITTER;
-                if (twitter) {
+                if (twitter && twitter_regex.test(twitter)) {
                     this.twitter = twitter;
                 } else {
                     this.twitter = '';
                 }
                 
                 const twitch = xhr.response.TWITCH;
-                if (twitch) {
-                    this.twitch = twitch;
+                if (twitch && twitch_regex.test(twitch)) {
+                    const match = twitch.match(twitch_regex);
+                    this.twitch = match[1];
                 } else {
                     this.twitch = '';
                 }
                 
                 const facebook = xhr.response.FACEBOOK;
-                if (facebook) {
+                if (facebook && facebook_regex.test(facebook)) {
                     this.facebook = facebook;
                 } else {
                     this.facebook = '';
+                }
+                
+                const youtube = xhr.response.YOUTUBE;
+                if (youtube && youtube_regex.test(youtube)) {
+                    this.youtube = youtube;
+                } else {
+                    this.youtube = '';
+                }
+
+                const github = xhr.response.GITHUB;
+                if (github && github_regex.test(github)) {
+                    this.github = github;
+                } else {
+                    this.github = '';
                 }
                 
                 const url = xhr.response.URL;
@@ -362,6 +407,16 @@ a.extra-twitch:hover {
     font-size: 2em;
 }
 
+a.extra-youtube{
+    color: red !important;
+    font-size: 2em;
+}
+
+a.extra-youtube:hover {
+    color: darkred !important;
+    font-size: 2em;
+}
+
 a.extra-facebook{
     color: #4267B2 !important;
     font-size: 2em;
@@ -369,6 +424,16 @@ a.extra-facebook{
 
 a.extra-facebook:hover {
     color: #35528E !important;
+    font-size: 2em;
+}
+
+a.extra-github{
+    color: #333 !important;
+    font-size: 2em;
+}
+
+a.extra-github:hover {
+    color: #222 !important;
     font-size: 2em;
 }
 
