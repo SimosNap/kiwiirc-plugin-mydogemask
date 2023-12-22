@@ -22,7 +22,7 @@ export default {
     props: ['componentProps'],
     data() {
         return {
-            player: 'https://player.twitch.tv/?channel=' + this.componentProps.twitch + '&parent=kiwiirc-dev.simosnap.com' ,
+            player: 'https://player.twitch.tv/?channel=' + this.componentProps.twitch + '&parent='+ window.location.hostname ,
         };
     },
 };
