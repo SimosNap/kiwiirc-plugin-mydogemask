@@ -41,6 +41,8 @@ in magirc lib/magirc/services/Anope.class.php add :
 
 Plugin live example here [https://dogecoinlab.org](https://dogecoinlab.org)
 
+Build your dogecoin webchat [https://www.simosnap.org/resources#kiwiircform](Chat Builder)
+
 
 
 # Donations
