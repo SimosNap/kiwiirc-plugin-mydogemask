@@ -212,7 +212,7 @@ export default {
             const mydogemask = window.doge;
 
 
-            if (!mydogemask?.isMyDogeMask) {
+            if (!mydogemask?.isMyDoge) {
                 this.notinstalled = true;
             }
 
@@ -296,7 +296,7 @@ export default {
         onTip() {
             const mydogemask = window.doge;
 
-            if (!mydogemask?.isMyDogeMask) {
+            if (!mydogemask?.isMyDoge) {
                 alert('MyDogeMask not installed!');
                 return;
             }

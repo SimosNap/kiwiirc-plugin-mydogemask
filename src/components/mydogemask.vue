@@ -56,7 +56,7 @@ export default {
         clickDogeToggle() {
             const mydogemask = window.doge;
 
-            if (!mydogemask?.isMyDogeMask) {
+            if (!mydogemask?.isMyDoge) {
                 alert('MyDogeMask not installed!');
                 return;
             }
