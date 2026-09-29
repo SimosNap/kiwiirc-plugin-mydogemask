@@ -1,20 +1,65 @@
 <template>
-    <div class="tip-card">
-        <div class="tip-icon">
-            <img src="plugins/wallet-icons/tippingjar_48.png">
+    <div :class="['tip-card', { 'tip-card--error': error }]">
+        <div class="tip-card-icon">
+            <i
+                :class="[
+                    'fa',
+                    error ? 'fa-exclamation-triangle' : (self ? 'fa-paper-plane' : 'fa-gift')
+                ]"
+                aria-hidden="true"
+            ></i>
         </div>
-        <div v-if="!self">
-            You got a Tip! <a class="kiwi-nick" :data-nick="nickname">{{ nickname }}</a> sent you {{ amount }} Ðogecoin!
-            <br>
-            <a :href="dogechain" target="_blank">View Transaction</a>
+
+        <div class="tip-card-content">
+            <template v-if="!self">
+                <div class="tip-card-title">
+                    You received
+                    <strong>{{ amount }} Ð</strong>
+                </div>
+
+                <div class="tip-card-meta">
+                    from
+                    <a class="kiwi-nick" :data-nick="nickname">{{ nickname }}</a>
+                </div>
+
+                <a class="tip-card-transaction" :href="dogechain" target="_blank">
+                    View transaction
+                    <i class="fa fa-external-link" aria-hidden="true"></i>
+                </a>
+            </template>
+
+            <template v-else-if="!error">
+                <div class="tip-card-title">
+                    You sent
+                    <strong>{{ amount }} Ð</strong>
+                </div>
+
+                <div class="tip-card-meta">
+                    to
+                    <a class="kiwi-nick" :data-nick="nickname">{{ nickname }}</a>
+                </div>
+
+                <a class="tip-card-transaction" :href="dogechain" target="_blank">
+                    View transaction
+                    <i class="fa fa-external-link" aria-hidden="true"></i>
+                </a>
+            </template>
+
+            <template v-else>
+                <div class="tip-card-title">
+                    Tip not sent
+                </div>
+
+                <div class="tip-card-meta">
+                    to
+                    <a class="kiwi-nick" :data-nick="nickname">{{ nickname }}</a>
+                </div>
+
+                <div class="tip-card-reason">
+                    {{ reason }}
+                </div>
+            </template>
         </div>
-        <div v-else>
-            <span v-if="!error">You sent a tip of {{ amount }} Ðogecoin to <a class="kiwi-nick" :data-nick="nickname">{{ nickname }}</a>!</span>
-            <span v-else>You failed to send a Ðogecoin tip to <a class="kiwi-nick" :data-nick="nickname">{{ nickname }}</a>!</span>
-            <br>
-            <span v-if="!error"><a :href="dogechain" target="_blank">View Transaction</a></span>
-            <span v-else>Reason: {{ reason }}</span>
-        </div>        
     </div>
 </template>
 
@@ -31,27 +76,161 @@ export default {
 
 </script>
 <style>
-div.tip-card {
+/* ============================================================
+   DOGECOIN TIP MESSAGE
+============================================================ */
+
+.tip-card {
     width: 480px;
+    max-width: 100%;
     display: flex !important;
+    align-items: stretch;
+
+    overflow: hidden;
+
+    background: var(--brand-default-bg);
     border: 1px solid var(--comp-border);
-    border-radius: 5px;
-    line-height: 1.25em;
+    border-radius: 4px;
+
+    color: var(--brand-default-fg);
+    line-height: 1.3;
+
+    box-sizing: border-box;
 }
 
 .tip-card div {
     white-space: normal !important;
 }
-.tip-icon {
-    padding: 4px;
-    width: 40px;
-    height:40px;
+
+
+/* ============================================================
+   ICON
+============================================================ */
+
+.tip-card-icon {
+    flex: 0 0 46px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: var(--brand-primary);
+    font-size: 18px;
 }
-.tip-icon img {
-    width: 32px;
-    height:32px;
+
+.tip-card-icon .fa {
+    width: 20px;
+    text-align: center;
 }
-.tip-card p {
-    margin: 0px;
+
+
+/* ============================================================
+   CONTENT
+============================================================ */
+
+.tip-card-content {
+    min-width: 0;
+    flex: 1;
+
+    padding: 7px 10px 7px 0;
+}
+
+.tip-card-title {
+    color: var(--brand-default-fg);
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.35;
+}
+
+.tip-card-title strong {
+    margin-left: 3px;
+
+    color: var(--brand-primary);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.tip-card-meta {
+    margin-top: 2px;
+
+    color: var(--brand-default-fg);
+    font-size: 10px;
+    line-height: 1.35;
+
+    opacity: 0.7;
+}
+
+.tip-card-meta .kiwi-nick {
+    font-weight: 600;
+    opacity: 1;
+}
+
+
+/* ============================================================
+   TRANSACTION
+============================================================ */
+
+.tip-card-transaction {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+
+    margin-top: 4px;
+
+    color: var(--brand-primary);
+    font-size: 10px;
+    font-weight: 600;
+    line-height: 1.3;
+    text-decoration: none;
+}
+
+.tip-card-transaction:hover {
+    text-decoration: underline;
+}
+
+.tip-card-transaction .fa {
+    font-size: 9px;
+}
+
+
+/* ============================================================
+   ERROR
+============================================================ */
+
+.tip-card--error .tip-card-icon {
+    color: var(--brand-error);
+}
+
+.tip-card--error .tip-card-title {
+    color: var(--brand-error);
+}
+
+.tip-card-reason {
+    margin-top: 4px;
+
+    color: var(--brand-default-fg);
+    font-size: 10px;
+    line-height: 1.35;
+
+    opacity: 0.75;
+}
+
+
+/* ============================================================
+   MOBILE
+============================================================ */
+
+@media (max-width: 600px) {
+    .tip-card {
+        width: 100%;
+    }
+
+    .tip-card-icon {
+        flex-basis: 40px;
+    }
+
+    .tip-card-content {
+        padding-right: 8px;
+    }
 }
 </style>

@@ -1,66 +1,102 @@
 <template>
     <div>
-        <a v-if="address && !isSelf()" class="kiwi-userbox-action" style="margin-bottom:10px !important;" @click="isHidden=false;tipAmount=''">
-            <span class="doge-symbol"></span>Dogecoin Tipping Jar
+        <a v-if="address && !isSelf()" class="kiwi-userbox-action dogecoin-tip" @click="isHidden=false;tipAmount=''">
+            <i class="fa fa-gift doge-symbol" aria-hidden="true"></i>
+            <span>Dogecoin Tipping Jar</span>
         </a>
 
-        <a v-if="isSelf() && this.user.account && address" class="kiwi-userbox-action dogecoin-address" style="margin-bottom:10px !important;">
-            <!-- <span class="address">{{address}}</span> -->
-            <input type="text" :value="address">
+        <div v-if="isSelf() && this.user.account && address" class="kiwi-userbox-action dogecoin-address">
+            <i class="fa fa-link" aria-hidden="true"></i>
+            <span class="dogecoin-address-value">{{ address }}</span>
+        </div>
+
+        <a v-if="isSelf() && this.user.account && !address" class="kiwi-userbox-action dogecoin-set" @click="Hidden=false">
+            <i class="fa fa-plus-circle" aria-hidden="true"></i>
+            <span>Set Dogecoin Address</span>
         </a>
 
-        <a v-if="isSelf() && this.user.account && !address" class="kiwi-userbox-action" style="margin-bottom:10px !important;" @click="Hidden=false">
-            Set Dogecoin Address
-        </a>
-
-        <a v-if="isSelf() && this.user.account && address" class="kiwi-userbox-action" style="margin-bottom:10px !important;" @click="onUnsetAddress()">
-            Unset Dogecoin Address
+        <a v-if="isSelf() && this.user.account && address" class="kiwi-userbox-action dogecoin-unset" @click="onUnsetAddress()">
+            <i class="fa fa-trash-o" aria-hidden="true"></i>
+            <span>Remove Dogecoin Address</span>
         </a>
 
         <div v-if="!isHidden" class="modal" @click="isHidden=true"/>
 
         <div v-if="!isHidden" class="tipform">
-            <i class="fa fa-times-circle" aria-hidden="true" @click="isHidden=true" style="position:absolute;top:5px;right:5px;"></i>
-            <h3 class="tipheader"><i class="fa fa-paw MyDogeIcon" aria-hidden="true"/> Tip {{ this.user.nick }}</h3>
+            <div class="tipform-header">
+                <i class="fa fa-money" aria-hidden="true"></i>
+                <span>Tip {{ this.user.nick }}</span>
+
+                <button class="tipform-close" type="button" @click="isHidden=true">
+                    <i class="fa fa-times" aria-hidden="true"></i>
+                </button>
+            </div>
+
             <div v-if="!this.pluginState.connected" class="external-wallet">
                 <img v-if="generatedQR" :src="generatedQR" class="qrcode">
+
                 <div class="address-link">
-                    <i class="fa fa-clipboard clipboard-copy" aria-hidden="true" @click="copyAddress()"/>
-                    <input type="text" :value="address">
+                    <i
+                        class="fa fa-clipboard clipboard-copy"
+                        aria-hidden="true"
+                        @click="copyAddress()"
+                    ></i>
+                    <span class="tip-address">{{ address }}</span>
                 </div>
             </div>
-            <div v-if="this.pluginState.connected">
+
+            <div v-if="this.pluginState.connected" class="tipform-connected">
                 <label class="tipsend">
-                    <input v-model="tipAmount" type="number" placeholder="0.69" step="0.01" min="0.01">
+                    <span class="tipsend-label">Dogecoin amount</span>
+                    <input
+                        v-model="tipAmount"
+                        type="number"
+                        placeholder="0.69"
+                        step="0.01"
+                        min="0.01"
+                    >
                 </label>
-                <label>
-                    <button :class="['u-button', 'u-button-primary', 'u-submit', 'kiwi-welcome-simple-start']" style="width:100%;" @click="onTip()">Send Dogecoin</button>
-                </label>
-                <label>
-                    <button :class="['u-button', 'u-button-primary', 'u-submit', 'kiwi-welcome-simple-start']" style="width:100%;margin-top:10px;" @click="isHidden=true;">Annulla</button>
-                </label>
+
+                <div class="tipform-actions">
+                    <button class="tipform-button tipform-button--confirm" @click="onTip()">
+                        Send Dogecoin
+                    </button>
+
+                    <button class="tipform-button tipform-button--cancel" @click="isHidden=true">
+                        Cancel
+                    </button>
+                </div>
             </div>
         </div>
 
         <div v-if="!Hidden" class="modal" @click="Hidden=true"/>
 
         <div v-if="!Hidden" class="addrform">
-            <h3 class="addrheader"><i class="fa fa-paw MyDogeIcon" aria-hidden="true"/> Dogecoin Wallet</h3>
-            <div v-if="addrerror" class="error"><i class="fa fa-exclamation-triangle" aria-hidden="true"/> Invalid Dogecoin Address!</div>
-            <fieldset><legend>Set address</legend>
-                <label class="addrset">
-                    <input v-model="nsaddress" type="text" placeholder="">
-                </label>
-            </fieldset>
-            <label>
-                <button :class="['u-button', 'u-button-primary', 'u-submit', 'kiwi-welcome-simple-start']" style="width:100%;" @click="onNsAddress()">Set Address</button>
-            </label>
-            <label>
-                <button :class="['u-button', 'u-button-primary', 'u-submit', 'kiwi-welcome-simple-start']" style="width:100%;margin-top:10px;" @click="Hidden=true;">Annulla</button>
+            <div class="addrform-header">
+                <i class="fa fa-money" aria-hidden="true"></i>
+                <span>Dogecoin Address</span>
+            </div>
+
+            <div v-if="addrerror" class="error">
+                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                Invalid Dogecoin Address!
+            </div>
+
+            <label class="addrset">
+                <span class="addrset-label">Tipping Jar address</span>
+                <input v-model="nsaddress" type="text" placeholder="Dogecoin address">
             </label>
 
+            <div class="addrform-actions">
+                <button class="addrform-button addrform-button--confirm" @click="onNsAddress()">
+                    Set Address
+                </button>
+
+                <button class="addrform-button addrform-button--cancel" @click="Hidden=true">
+                    Cancel
+                </button>
+            </div>
         </div>
-
     </div>
 </template>
 
@@ -229,14 +265,17 @@ export default {
 </script>
 <style>
 
+.dogecoin-tip {
+    display: flex !important;
+    align-items: center;
+    gap: 7px;
+}
+
 .doge-symbol {
-    background: url("/plugins/wallet-icons/tippingjar_48.png");
-    background-size: 18px;
-    display: inline-block;
-    width: 18px;
-    height: 18px;
-    margin-bottom: -4px;
-    margin-right: 5px;
+    flex: 0 0 auto;
+
+    color: var(--brand-primary);
+    font-size: 12px;
 }
 
 .clipboard-copy {
@@ -269,9 +308,11 @@ export default {
     justify-content: center;
     align-items: center;
 }
+
 .address-link {
     width: 215px !important;
 }
+
 .external-wallet input[type=text] {
     width: calc(100% - 20px);
     border: 1px solid var(--comp-border);
@@ -279,109 +320,327 @@ export default {
     border-radius: 3px;
     box-sizing: border-box;
 }
+
 .qrcode {
     border: 1px dotted var(--comp-border);
     border-radius: 3px;
     margin: 10px;
 }
+
 .dogecoin-address {
-    background: #fdc41c;
-    border-color: #fdc41c;
+    display: flex !important;
+    align-items: center;
+    gap: 7px;
+
+    cursor: default;
 }
 
-.kiwi-userbox .kiwi-userbox-actions .kiwi-userbox-action.dogecoin-address:hover {
-    background-color: #fdc41c !important;
-    color: black;
-    border-color: #fdc41c;
+.dogecoin-address .fa {
+    flex: 0 0 auto;
+
+    color: var(--brand-primary);
+    font-size: 12px;
 }
 
-span.address {
-    font-size:0.70em;
+.dogecoin-address-value {
+    min-width: 0;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    font-size: 11px;
+    font-weight: 400;
 }
 
-.dogecoin-address input {
-    padding:5px;
-    border: 1px dotted var(--comp-border);
-    background: white;
-    border-radius: 3px;
-    color: black;
-    width:100%;
-    box-sizing: border-box;
-
+.dogecoin-unset {
+    display: flex !important;
+    align-items: center;
+    gap: 7px;
 }
 
-.addrform fieldset {
-    border-radius: 8px;
-    margin-bottom:15px;
-    border:1px solid  var(--brand-link-normal);
+.dogecoin-unset .fa {
+    flex: 0 0 auto;
+    font-size: 12px;
+    opacity: 0.65;
 }
 
-.addrform input[type=text] {
-    width: 100%;
-    border: 1px solid var(--comp-border);
-    padding: 5px;
-    border-radius: 3px;
-    box-sizing: border-box;
+.dogecoin-set {
+    display: flex !important;
+    align-items: center;
+    gap: 7px;
 }
 
-.tipform .error, .addrform .error {
-    background: var(--brand-error);
-    padding: 5px;
-    border-radius: 3px;
-    box-sizing: border-box;
+.dogecoin-set .fa {
+    flex: 0 0 auto;
+    color: var(--brand-primary);
+    font-size: 12px;
 }
 
-.tipheader {
-    text-align:center;
+.dogecoin-unset:hover .fa {
+    opacity: 1;
 }
 
-.tipheader i , .addrheader i {
-    color: white;
-    border: 1px solid #fdc41c;
-    padding: 3px;
-    border-radius: 3px;
-    background-color: #fdc41c;
-}
+/* ============================================================
+   DOGECOIN POPUPS
+============================================================ */
 
-.kiwi-userbox-plugin-actions div.tipform , .kiwi-userbox-plugin-actions div.addrform{
+.kiwi-userbox-plugin-actions div.tipform,
+.kiwi-userbox-plugin-actions div.addrform {
     width: auto;
 }
 
-.tipform , .addrform {
+.tipform,
+.addrform {
     position: absolute;
     z-index: 99999999999999;
-    left: 50%;
-    transform: translate(-50%);
-    height:auto;
-    background:var(--brand-default-bg);
-    top:20px;
-    display:block;
-    border-radius: 8px;
+    top: 20px;
+    left: 5px;
+    right: 5px;
+
+    display: block;
+    height: auto;
     padding: 10px;
+
+    background: var(--comp-statebrowser-bg);
+    border-radius: 8px;
+
+    color: var(--comp-statebrowser-fg);
     text-align: left;
     box-sizing: border-box;
 }
 
-.tipform label , .addrform label {
-    display: block;
-    font-weight:bold;
+
+/* Header */
+
+.tipform-header,
+.addrform-header {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+
+    padding-bottom: 8px;
+    margin-bottom: 10px;
+
+    border-bottom: 1px solid var(--comp-ui-surface-border);
+
+    color: var(--comp-statebrowser-fg);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1;
 }
 
-.tipsend , addrset {
-    margin: 1.5em;
+.tipform-header > .fa,
+.addrform-header > .fa {
+    flex: 0 0 auto;
+
+    color: var(--brand-primary);
+    font-size: 12px;
+}
+
+
+/* Close tip popup */
+
+.tipform-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    margin-left: auto;
+
+    background: transparent;
+    border: 0;
+
+    color: var(--comp-statebrowser-fg);
+    font-size: 11px;
+
+    cursor: pointer;
+    opacity: 0.55;
+}
+
+.tipform-close:hover {
+    opacity: 1;
+}
+
+
+/* Set address */
+
+.addrset,
+.tipsend {
+    display: block;
+    margin: 0 0 10px;
+}
+
+.addrset-label,
+.tipsend-label {
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: var(--comp-statebrowser-fg);
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.addrform input[type="text"],
+.tipform input[type="number"] {
+    width: 100%;
+    padding: 6px 7px;
+
+    background: var(--comp-statebrowser-bg);
+    border: 1px solid var(--comp-ui-surface-border);
+    border-radius: 3px;
+
+    color: var(--comp-statebrowser-fg);
+    font-family: inherit;
+    font-size: 11px;
+
+    box-sizing: border-box;
+    outline: none;
+}
+
+.tipform input[type="number"] {
+    font-size: 14px;
     text-align: center;
 }
-input[type=number] {
-    font-size: 1.50em;
-    text-align: center;
-    border-radius:3px;
-    border: 1px solid var(--comp-border);
-    padding: 5px;
+
+.addrform input[type="text"]:focus,
+.tipform input[type="number"]:focus {
+    border-color: var(--brand-primary);
+}
+
+
+/* Error */
+
+.tipform .error,
+.addrform .error {
+    margin-bottom: 10px;
+    padding: 6px 7px;
+
+    background: var(--brand-error);
+    border-radius: 3px;
+
+    color: #fff;
+    font-size: 10px;
+    line-height: 1.35;
+
     box-sizing: border-box;
 }
 
-input[type=number]:focus {
-    border: 1px solid var(--comp-border);
+
+/* External wallet / QR */
+
+.external-wallet {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.qrcode {
+    width: 150px;
+    height: 150px;
+    margin: 2px 0 10px;
+
+    background: #fff;
+    border: 1px solid var(--comp-ui-surface-border);
+    border-radius: 4px;
+}
+
+.address-link {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+
+    width: 100% !important;
+    min-width: 0;
+    padding: 6px 7px;
+
+    border: 1px solid var(--comp-ui-surface-border);
+    border-radius: 3px;
+
+    box-sizing: border-box;
+}
+
+.address-link .clipboard-copy {
+    flex: 0 0 auto;
+
+    color: var(--brand-primary);
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.tip-address {
+    min-width: 0;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    color: var(--comp-statebrowser-fg);
+    font-size: 10px;
+}
+
+
+/* Actions */
+
+.tipform-actions,
+.addrform-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.tipform-button,
+.addrform-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    min-height: 30px;
+    padding: 5px 8px;
+
+    background: transparent;
+    border: 1px solid var(--comp-ui-surface-border);
+    border-radius: 3px;
+
+    color: var(--comp-statebrowser-fg);
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 600;
+
+    cursor: pointer;
+    box-sizing: border-box;
+
+    transition:
+        background-color 0.15s ease,
+        border-color 0.15s ease,
+        color 0.15s ease,
+        opacity 0.15s ease;
+}
+
+.tipform-button:hover,
+.addrform-button:hover {
+    background: var(--comp-ui-surface-hover-bg);
+}
+
+.tipform-button--confirm,
+.addrform-button--confirm {
+    border-color: var(--brand-primary);
+    color: var(--brand-primary);
+}
+
+.tipform-button--cancel,
+.addrform-button--cancel {
+    opacity: 0.7;
+}
+
+.tipform-button--cancel:hover,
+.addrform-button--cancel:hover {
+    opacity: 1;
 }
 
 </style>
